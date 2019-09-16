@@ -1,16 +1,15 @@
-const express = require('express')
-const bodyParser = require('body-parser')
-var https = require('https');
+const express = require('express');
+const apiRouter = require('./routes/routes.js');
 
 
-const app = express()
-app.use(bodyParser.urlencoded({
-    extended: false
-}))
-app.use(bodyParser.json())
 
-app.get('/api-phr', (req, res) => {
-    res.json("server running")
-})
+const app = express();
 
-app.listen(3000, console.log("server running at port 3000"))
+
+app.use(express.json());
+
+app.use('/api-phr', apiRouter);
+
+app.listen(process.env.PORT || '3000', () => {
+    console.log("server berjalan di port:  3000");
+});
