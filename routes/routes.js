@@ -141,11 +141,23 @@ router.get('/search/data', verifyToken, (req, res, next) => {
 })
 
 
+// function verifyToken(req, res, next) {
+//     const bearerHeader = req.headers['authorization'];
+//     if (typeof bearerHeader !== 'undefined') {
+//         const bearer = bearerHeader.split(' ');
+//         const bearerToken = bearer[1];
+//         req.token = bearerToken;
+
+//         next();
+//     } else {
+//         res.sendStatus(403)
+//     }
+// }
 function verifyToken(req, res, next) {
     const bearerHeader = req.headers['authorization'];
     if (typeof bearerHeader !== 'undefined') {
-        const bearer = bearerHeader.split(' ');
-        const bearerToken = bearer[1];
+        const bearer = bearerHeader;
+        const bearerToken = bearer;
         req.token = bearerToken;
 
         next();
