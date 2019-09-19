@@ -22,6 +22,24 @@ mydb.all = () => {
     });
 };
 
+mydb.user = () => {
+    return new Promise((resolve, reject) => {
+        let sql = `SELECT user.id, pembayaran_pajak_temp.no_transaksi, pembayaran_pajak_temp.npwpd, pembayaran_pajak_temp.tgl_pembayaran, pembayaran_pajak_temp.bulan,
+    pembayaran_pajak_temp.tahun, pembayaran_pajak_temp.pendapatan, pembayaran_pajak_temp.pajak_terhutang, pembayaran_pajak_temp.denda, pembayaran_pajak_temp.total_bayar, pembayaran_pajak_temp.user_id,
+    pembayaran_pajak_temp.kode_pajak, pembayaran_pajak_temp.kode_pajak_detail, pembayaran_pajak_temp.nomor_rekening, pembayaran_pajak_temp.kode_golongan,
+    pembayaran_pajak_temp.status_flag, pembayaran_pajak_temp.no_arsip, pembayaran_pajak_temp.tgl_expired, pembayaran_pajak_temp.keterangan,
+    pembayaran_pajak_temp.keterangan_kegiatan FROM user,
+    pembayaran_pajak_temp WHERE user.id = pembayaran_pajak_temp.user_id AND user.id = 246`;
+        pool.query(sql, (err, results) => {
+            if (err) {
+                return reject(err);
+            }
+            return resolve(results);
+        });
+
+    });
+};
+
 mydb.one = (no_transaksi) => {
     return new Promise((resolve, reject) => {
 
@@ -40,7 +58,7 @@ mydb.one = (no_transaksi) => {
 
 mydb.update = (status_flag, no_transaksi) => {
     return new Promise((resolve, reject) => {
-        pool.query("UPDATE pembayaran_pajak_temp SET status_flag = ? where no_transaksi = ? ", [status_flag, no_transaksi], (err, results) => {
+        pool.query("UPDATE pembayaran_pajak_temp SET status_flag = ?, user_id = 246 where no_transaksi = ? ", [status_flag, no_transaksi], (err, results) => {
             if (err) {
                 return reject(err);
             }

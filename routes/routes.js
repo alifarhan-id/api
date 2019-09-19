@@ -4,6 +4,49 @@ const jwt = require('jsonwebtoken')
 
 const router = express.Router();
 
+router.get('/', (req, res) => {
+    res.json({
+        message: 'server running'
+    })
+})
+
+const username = "bpd"
+const password = "qwerty123"
+
+router.post('/login', (req, res, next) => {
+    const p_username = req.body.username
+    const p_password = req.body.password
+    if (p_username == username && p_password == password) {
+        var token = jwt.sign({
+                username: username
+            },
+            'secretkey', {
+                expiresIn: '10h'
+            },
+            (err, token) => {
+                res.json({
+                    ok: true,
+                    message: "Login successful",
+                    token: token
+                })
+            })
+    } else {
+        res.send({
+            ok: false,
+            message: "Username or password incorrect"
+        })
+    }
+})
+
+router.get('/commands', (req, res) => {
+    res.json({
+        "1": '/login    -> url: http://bkd.sangat.top/api-phr/login',
+        "2": '/commands -> url: http://bkd.sangat.top/api-phr/commands',
+        "3": '/search   -> url: http://bkd.sangat.top/api-phr/search/:no_transaksi',
+        "4": '/update   -> url: http://bkd.sangat.top/api-phr/update/:no_transaksi',
+        "5": '/print    -> url: http://bkd.sangat.top/api-phr/print/:no_transaksi',
+    })
+})
 router.get('/pembayaran/', verifyToken, (req, res, next) => {
 
     jwt.verify(req.token, 'secretkey', async (err) => {
@@ -19,8 +62,23 @@ router.get('/pembayaran/', verifyToken, (req, res, next) => {
     })
 
 })
+router.get('/search/data', verifyToken, (req, res, next) => {
 
-router.get('/pembayaran/search/:id', verifyToken, (req, res, next) => {
+    jwt.verify(req.token, 'secretkey', async (err) => {
+        if (err) {
+            res.sendStatus(403)
+        } else {
+            let hasil = await db.user()
+            res.json({
+                Status: 200,
+                Data: hasil
+            });
+        }
+    })
+
+})
+
+router.get('/search/:id', verifyToken, (req, res, next) => {
 
     jwt.verify(req.token, 'secretkey', async (err) => {
         if (err) {
@@ -41,8 +99,9 @@ router.get('/pembayaran/search/:id', verifyToken, (req, res, next) => {
 
 })
 
-router.put('/pembayaran/update/:no_transaksi', verifyToken, (req, res, next) => { //search pembayaran by npwpd
+router.put('/update/:no_transaksi', verifyToken, (req, res, next) => { //search pembayaran by npwpd
     jwt.verify(req.token, 'secretkey', async (err) => {
+        // var user_id = req.body.user_id
         if (err) {
             console.log(err)
             res.json({
@@ -54,40 +113,33 @@ router.put('/pembayaran/update/:no_transaksi', verifyToken, (req, res, next) => 
             let hasil = await db.update(req.body.status_flag, req.params.no_transaksi);
             res.json({
                 status: 200,
+                "user_id": req.body.user_id,
                 "status_flag": req.body.status_flag,
                 message: "data berhasil di update"
             });
+            console.log(user_id)
         }
     })
 
 
 })
 
-const username = "bpd"
-const password = "qwerty123"
+router.get('/search/data', verifyToken, (req, res, next) => {
 
-router.post('/login', (req, res, next) => {
-    const p_username = req.body.username
-    const p_password = req.body.password
-    if (p_username == username && p_password == password) {
-        var token = jwt.sign({
-                username: username
-            },
-            'secretkey',
-            (err, token) => {
-                res.json({
-                    ok: true,
-                    message: "Login successful",
-                    token: token
-                })
-            })
-    } else {
-        res.send({
-            ok: false,
-            message: "Username or password incorrect"
-        })
-    }
+    jwt.verify(req.token, 'secretkey', async (err) => {
+        if (err) {
+            res.sendStatus(403)
+        } else {
+            let hasil = await db.user()
+            res.json({
+                Status: 200,
+                Data: hasil
+            });
+        }
+    })
+
 })
+
 
 function verifyToken(req, res, next) {
     const bearerHeader = req.headers['authorization'];
