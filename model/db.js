@@ -12,7 +12,7 @@ const pool = mysql.createPool({
 let mydb = {};
 mydb.all = () => {
     return new Promise((resolve, reject) => {
-        pool.query('SELECT * FROM pembayaran_pajak_temp', (err, results) => {
+        pool.query('SELECT * FROM pembayaran_pajak_temp WHERE status_flag = 0', (err, results) => {
             if (err) {
                 return reject(err);
             }
@@ -38,9 +38,9 @@ mydb.one = (no_transaksi) => {
     });
 }
 
-mydb.update = (no_transaksi) => {
+mydb.update = (status_flag, no_transaksi) => {
     return new Promise((resolve, reject) => {
-        pool.query("UPDATE pembayaran_pajak_temp SET status_flag = ? ", [no_transaksi], (err, results) => {
+        pool.query("UPDATE pembayaran_pajak_temp SET status_flag = ? where no_transaksi = ? ", [status_flag, no_transaksi], (err, results) => {
             if (err) {
                 return reject(err);
             }

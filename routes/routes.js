@@ -11,7 +11,10 @@ router.get('/pembayaran/', verifyToken, (req, res, next) => {
             res.sendStatus(403)
         } else {
             let hasil = await db.all()
-            res.json(hasil);
+            res.json({
+                Status: 200,
+                Data: hasil
+            });
         }
     })
 
@@ -29,7 +32,10 @@ router.get('/pembayaran/search/:id', verifyToken, (req, res, next) => {
             })
         } else {
             let hasil = await db.one(req.params.id);
-            res.json(hasil);
+            res.json({
+                Status: 200,
+                Data: hasil
+            });
         }
     })
 
@@ -46,18 +52,15 @@ router.put('/pembayaran/update/:no_transaksi', verifyToken, (req, res, next) => 
             })
         } else {
             let hasil = await db.update(req.body.status_flag, req.params.no_transaksi);
-            res.json(hasil);
+            res.json({
+                status: 200,
+                "status_flag": req.body.status_flag,
+                message: "data berhasil di update"
+            });
         }
     })
 
-    // try {
-    //     let hasil = await db.update(req.body.status_flag, req.params.no_transaksi);
-    //     res.json(hasil);
-    //     console.log('data berhasil diperbaharui')
-    // } catch (e) {
-    //     console.log(e)
-    //     res.sendStatus(500)
-    // }
+
 })
 
 const username = "bpd"
