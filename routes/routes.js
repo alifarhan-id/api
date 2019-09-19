@@ -1,36 +1,105 @@
 const express = require('express');
 const db = require('../model/db.js');
+const jwt = require('jsonwebtoken')
+
 const router = express.Router();
 
-router.get('/pembayaran/', async (req, res, next) => {
-    try {
-        let hasil = await db.all()
-        res.json(hasil);
-    } catch (e) {
-        console.log(e)
-        res.sendStatus(500)
+router.get('/pembayaran/', verifyToken, (req, res, next) => {
+
+    jwt.verify(req.token, 'secretkey', async (err) => {
+        if (err) {
+            res.sendStatus(403)
+        } else {
+            let hasil = await db.all()
+            res.json(hasil);
+        }
+    })
+
+})
+
+router.get('/pembayaran/search/:id', verifyToken, (req, res, next) => {
+
+    jwt.verify(req.token, 'secretkey', async (err) => {
+        if (err) {
+            console.log(err)
+            res.json({
+                ok: false,
+                message: 'tidak ada akses ambil token dulu hep',
+                status: 'Forbidden'
+            })
+        } else {
+            let hasil = await db.one(req.params.id);
+            res.json(hasil);
+        }
+    })
+
+})
+
+router.put('/pembayaran/update/:no_transaksi', verifyToken, (req, res, next) => { //search pembayaran by npwpd
+    jwt.verify(req.token, 'secretkey', async (err) => {
+        if (err) {
+            console.log(err)
+            res.json({
+                ok: false,
+                message: 'tidak ada akses ambil token dulu hep',
+                status: 'Forbidden'
+            })
+        } else {
+            let hasil = await db.update(req.body.status_flag, req.params.no_transaksi);
+            res.json(hasil);
+        }
+    })
+
+    // try {
+    //     let hasil = await db.update(req.body.status_flag, req.params.no_transaksi);
+    //     res.json(hasil);
+    //     console.log('data berhasil diperbaharui')
+    // } catch (e) {
+    //     console.log(e)
+    //     res.sendStatus(500)
+    // }
+})
+
+const username = "bpd"
+const password = "qwerty123"
+
+router.post('/login', (req, res, next) => {
+    const p_username = req.body.username
+    const p_password = req.body.password
+    if (p_username == username && p_password == password) {
+        var token = jwt.sign({
+                username: username
+            },
+            'secretkey',
+            (err, token) => {
+                res.json({
+                    ok: true,
+                    message: "Login successful",
+                    token: token
+                })
+            })
+    } else {
+        res.send({
+            ok: false,
+            message: "Username or password incorrect"
+        })
     }
 })
 
-router.get('/pembayaran/search/:id', async (req, res, next) => { //search pembayaran by npwpd
-    try {
-        let hasil = await db.one(req.params.id);
-        res.json(hasil);
-    } catch (e) {
-        console.log(e)
-        res.sendStatus(500)
-    }
-})
+function verifyToken(req, res, next) {
+    const bearerHeader = req.headers['authorization'];
+    if (typeof bearerHeader !== 'undefined') {
+        const bearer = bearerHeader.split(' ');
+        const bearerToken = bearer[1];
+        req.token = bearerToken;
 
-router.get('/wp/search/', async (req, res, next) => {
-    try {
-        let hasil = await db.getWp()
-        res.json(hasil)
-    } catch (e) {
-        console.log(e)
-        res.sendStatus(500)
+        next();
+    } else {
+        res.sendStatus(403)
     }
-})
+}
+
+
 
 
 // router.post('/pembayaran/create/', async (req, res, next) => {
@@ -76,21 +145,6 @@ router.get('/wp/search/', async (req, res, next) => {
 //         res.sendStatus(500)
 //     }
 // })
-
-router.put('/pembayaran/update/:no_transaksi', async (req, res, next) => { //search pembayaran by npwpd
-
-    try {
-        let hasil = await db.update(req.body.status_flag, req.params.no_transaksi);
-        res.json(hasil);
-        console.log('data berhasil diperbaharui')
-    } catch (e) {
-        console.log(e)
-        res.sendStatus(500)
-    }
-})
-
-
-
 
 
 module.exports = router;

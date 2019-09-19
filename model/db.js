@@ -37,6 +37,17 @@ mydb.one = (no_transaksi) => {
         });
     });
 }
+
+mydb.update = (no_transaksi) => {
+    return new Promise((resolve, reject) => {
+        pool.query("UPDATE pembayaran_pajak_temp SET status_flag = ? ", [no_transaksi], (err, results) => {
+            if (err) {
+                return reject(err);
+            }
+            return resolve(results);
+        });
+    });
+}
 // mydb.getWp = () => {
 //     return new Promise((resolve, reject, data) => {
 //         let sql = `SELECT data_umum.npwpd, data_umum.kode_pajak, data_umum.kode_pajak_detail, data_umum.penanggung_pajak,
@@ -110,26 +121,17 @@ mydb.one = (no_transaksi) => {
 //     })
 // }
 
-mydb.update = (no_transaksi) => {
-    return new Promise((resolve, reject) => {
-        pool.query("UPDATE pembayaran_pajak_temp SET status_flag = ? ", [no_transaksi], (err, results) => {
-            if (err) {
-                return reject(err);
-            }
-            return resolve(results);
-        });
-    });
-}
 
-mydb.status = () => {
-    return new Promise((resolve, reject) => {
-        pool.query('SELECT DISTINCT npwpd, no_transaksi, tgl_expired, status_flag FROM pembayaran_pajak_temp', (err, results) => {
-            if (err) {
-                return reject(err);
-            }
-            return resolve(results[0]);
-        });
-    });
-}
+
+// mydb.status = () => {
+//     return new Promise((resolve, reject) => {
+//         pool.query('SELECT DISTINCT npwpd, no_transaksi, tgl_expired, status_flag FROM pembayaran_pajak_temp', (err, results) => {
+//             if (err) {
+//                 return reject(err);
+//             }
+//             return resolve(results[0]);
+//         });
+//     });
+// }
 
 module.exports = mydb;
